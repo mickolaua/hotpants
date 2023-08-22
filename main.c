@@ -12,6 +12,12 @@
 #include "globals.h"
 #include "functions.h"
 
+
+#ifdef __MINGW32__
+#include <stddef.h>
+#endif
+
+
 int main(int argc,char *argv[]) {
     int         i,j,k,l,m;                              /* generic indices */
     char        scrStr[SCRLEN];                         /* scratch string */
@@ -248,7 +254,13 @@ int main(int argc,char *argv[]) {
         fits_write_key_str(oPtr, "AUTHOR", "unknown", "Who ran the software", &status);
     
     /* host name */
-    if (!gethostname(hInfo, 80))
+#ifdef __MINGW32__
+    strncpy(hInfo, "Unknown", sizeof(hInfo)/sizeof(char));
+#else
+    gethostname(hInfo, 80);
+#endif
+
+    if (hInfo)
         fits_write_key_str(oPtr, "ORIGIN", hInfo, "Where it was done", &status);
     
     /* what was it fired up */
